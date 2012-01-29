@@ -108,8 +108,13 @@ if __name__ == '__main__':
 					q = cgi.parse_qs(parsed_path.query)
 					title = q['title'][0]
 					message = q['message'][0]
-					notify(title, message)
-					send = 'Message Sent Successfully'
+					p = notify(title, message)
+					err = p.stderr.read()
+					if err:
+						send = err
+						print err
+					else:
+						send = 'Message Sent Successfully'
 				except:
 					send = 'Error: Error parsing message'
 				s.send_response(200)
