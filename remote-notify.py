@@ -62,7 +62,11 @@ def r_callback(data, signal, signal_data):
 		'message' : message,
 	}
 	url = 'http://localhost:%d?%s' % (DEFAULT_PORT, urllib.urlencode(data))
-	output = urllib2.urlopen(url)
+	try:
+		# Try to make the request
+		output = urllib2.urlopen(url)
+	except:
+		weechat.prnt('', 'Failed to send remote notification')
 	# Do nothing with output
 	return weechat.WEECHAT_RC_OK
 
