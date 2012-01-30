@@ -36,8 +36,7 @@ __email__       = 'dave@daveeddy.com'
 __status__      = 'Release'
 __description__ = 'Send remote notifications to growl/osd-notify'
 
-import os
-import sys
+from os import uname
 
 in_weechat = True
 try:
@@ -47,7 +46,7 @@ except:
 
 DEFAULT_PORT = 4235
 DEFAULT_HOST = '127.0.0.1'
-UNAME = os.uname()[0]
+UNAME = uname()[0]
 
 def r_callback(data, signal, signal_data):
 	"""
@@ -56,7 +55,7 @@ def r_callback(data, signal, signal_data):
 	Take the data passed from weechat and
 	attempt to send the data to the server
 	"""
-	msg_sender, message = signal_data.split('\t')
+	msg_sender, message = signal_data.split('\t', 1)
 	data = {
 		'title'   : 'Mentioned by %s' % (msg_sender),
 		'message' : message,
@@ -74,7 +73,6 @@ def notify(title, message):
 	"""
 	Send a notification on a system
 	"""
-
 	if UNAME == 'Darwin':
 		# Use growl on a mac
 		cmd = ['growlnotify', '-m', message, '-t', title]
@@ -103,16 +101,17 @@ if __name__ == '__main__':
 			"""
 			Simple HTTP class to listen for GET requests
 			"""
-
 			def do_GET(s):
 				"""Respond to a GET request."""
-				# try to parse the request
 				try:
+					# try to parse the request
 					parsed_path = urlparse.urlparse(s.path)
 					q = cgi.parse_qs(parsed_path.query)
 					title = q['title'][0]
 					message = q['message'][0]
+					# Send the notification
 					p = notify(title, message)
+					# Check for errors
 					err = p.stderr.read()
 					if err:
 						send = err
@@ -129,8 +128,8 @@ if __name__ == '__main__':
 		# Create the httpd service
 		server_class = BaseHTTPServer.HTTPServer
 		httpd = server_class((DEFAULT_HOST, DEFAULT_PORT), MyHandler)
-		# Start the service
 		try:
+			# Start the service
 			print 'Listening on %s:%d' % (DEFAULT_HOST, DEFAULT_PORT)
 			httpd.serve_forever()
 		except KeyboardInterrupt:
