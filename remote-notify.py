@@ -56,9 +56,18 @@ try:
 except:
 	in_weechat = False
 
+# Default port and host to run the server
 DEFAULT_PORT = 4235
 DEFAULT_HOST = '127.0.0.1'
+
+# Uname of the machine
 UNAME = uname()[0]
+
+# Commands to use to make notifications based on uname
+NOTIFY_COMMANDS={
+	'Darwin'  : 'growlnotify',
+	'default' : 'notify-send',
+}
 
 def r_callback(data, signal, signal_data):
 	"""
@@ -67,11 +76,15 @@ def r_callback(data, signal, signal_data):
 	Take the data passed from weechat and
 	attempt to send the data to the server
 	"""
+	# Split the signal data to get the sender and the message
 	msg_sender, message = signal_data.split('\t', 1)
+
+	# Construct the GET paramaters to use for the notification
 	data = {
 		'title'   : 'Mentioned by %s' % (msg_sender),
 		'message' : message,
 	}
+	# Make the request URL
 	url = 'http://localhost:%d?%s' % (DEFAULT_PORT, urllib.urlencode(data))
 	try:
 		# Try to make the request
@@ -86,11 +99,11 @@ def notify(title, message):
 	Send a notification on a system
 	"""
 	if UNAME == 'Darwin':
-		# Use growl on a mac
-		cmd = ['growlnotify', '-m', message, '-t', title]
+		# Construct the mac command
+		cmd = [NOTIFY_COMMANDS[UNAME], '-m', message, '-t', title]
 	else:
-		# Otherwise default to notify-send
-		cmd = ['notify-send', title, message]
+		# Construct the default command
+		cmd = [NOTIFY_COMMANDS[UNAME], title, message]
 	try:
 		# Call the subprocess
 		p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -128,7 +141,7 @@ if __name__ == '__main__':
 					p = notify(title, message)
 					# Check for errors
 					if not p:
-						send = 'Command not found'
+						send = 'Command %s not found' % (NOTIFY_COMMANDS[UNAME])
 					else:
 						err = p.stderr.read()
 						if err:
