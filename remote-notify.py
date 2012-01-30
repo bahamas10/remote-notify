@@ -91,8 +91,11 @@ def notify(title, message):
 	else:
 		# Otherwise default to notify-send
 		cmd = ['notify-send', title, message]
-	# Call the subprocess
-	p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+	try:
+		# Call the subprocess
+		p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+	except OSError:
+		return None
 	# Return the Popen object
 	return p
 
@@ -124,18 +127,21 @@ if __name__ == '__main__':
 					# Send the notification
 					p = notify(title, message)
 					# Check for errors
-					err = p.stderr.read()
-					if err:
-						send = err
-						print err
+					if not p:
+						send = 'Command not found'
 					else:
-						send = 'Message Sent Successfully'
+						err = p.stderr.read()
+						if err:
+							send = err
+						else:
+							send = 'Message Sent Successfully'
 				except:
 					send = 'Error: Error parsing message'
 				s.send_response(200)
 				s.send_header("Content-type", "text/html")
 				s.end_headers()
 				s.wfile.write('<status>%s</status>' % (send))
+				print send
 
 		# Create the httpd service
 		server_class = BaseHTTPServer.HTTPServer
