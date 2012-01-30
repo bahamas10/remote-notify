@@ -5,3 +5,14 @@ whenever your nick is mentioned.
 When invoked on the shell it will act as the webserver
 that can recieve the request and display a growl/notify-osd
 alert.
+
+Usage:
+On the remote machine running weechat:
+	Enable the plugin:
+	/python load remote-notify.py
+On the machine you are connecting from:
+	Start the service.
+	~$ ./remote-notify.py
+	* This starts the web service listening on localhost
+	Then, ssh to the host running weechat and forward the port
+	~$ ssh -R 4235:localhost:4235 user@host

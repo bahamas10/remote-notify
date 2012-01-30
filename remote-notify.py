@@ -25,6 +25,18 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 # Allow remote notifications for weechat in growl/osd-notify
+#
+# :: To use ::
+# On the remote machine running weechat:
+#	Enable the plugin
+#	/python load remote-notify.py
+# On the machine you are connecting from:
+#	Start the service.
+#	~$ ./remote-notify.py
+#	* This starts the web service listening on localhost
+#	Then, ssh to the host running weechat and forward the port
+#	~$ ssh -R 4235:localhost:4235 user@host
+#
 
 __program__     = 'remote-notify'
 __author__      = 'David Eddy'
