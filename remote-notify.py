@@ -53,7 +53,7 @@ from os import uname
 in_weechat = True
 try:
 	import weechat
-except:
+except ImportError:
 	in_weechat = False
 
 # Default port and host to run the server
@@ -89,7 +89,7 @@ def r_callback(data, signal, signal_data):
 	try:
 		# Try to make the request
 		output = urllib2.urlopen(url)
-	except:
+	except URLError:
 		weechat.prnt('', 'Failed to send remote notification')
 	# Do nothing with output
 	return weechat.WEECHAT_RC_OK
