@@ -103,7 +103,7 @@ def notify(title, message):
 		cmd = [NOTIFY_COMMANDS[UNAME], '-m', message, '-t', title]
 	else:
 		# Construct the default command
-		cmd = [NOTIFY_COMMANDS[UNAME], title, message]
+		cmd = [NOTIFY_COMMANDS['default'], title, message]
 	try:
 		# Call the subprocess
 		p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
