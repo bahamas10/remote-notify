@@ -14,6 +14,7 @@ Usage
 On the remote machine running your irc client:
 
 * Enable the plugin:
+
 weechat
 -------
     /python load remote-notify.py
@@ -22,9 +23,7 @@ irssi
 -----
     /run remote-notify.pl
 
-On the machine you are connecting from:
-
-* Start the service.
+On the machine you are connecting from, start the service.
 
     ~$ ./remote-notify.py
 
