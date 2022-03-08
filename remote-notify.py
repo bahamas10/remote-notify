@@ -120,21 +120,20 @@ if __name__ == '__main__':
 			weechat.hook_signal('weechat_highlight', 'r_callback', '')
 	else:
 		# Running from the command line
-		import BaseHTTPServer
-		import urlparse
-		import cgi
+		from http.server import BaseHTTPRequestHandler, HTTPServer
+		from urllib import parse
 		import subprocess
 
-		class MyHandler(BaseHTTPServer.BaseHTTPRequestHandler):
+		class MyHandler(BaseHTTPRequestHandler):
 			"""
 			Simple HTTP class to listen for GET requests
 			"""
-			def do_GET(s):
+			def do_GET(self):
 				"""Respond to a GET request."""
 				try:
 					# try to parse the request
-					parsed_path = urlparse.urlparse(s.path)
-					q = cgi.parse_qs(parsed_path.query)
+					parsed_path = parse.urlsplit(self.path)
+					q = parse.parse_qs(parsed_path.query)
 					title = q['title'][0]
 					message = q['message'][0]
 					# Send the notification
@@ -150,18 +149,19 @@ if __name__ == '__main__':
 							send = 'Message Sent Successfully'
 				except:
 					send = 'Error: Error parsing message'
-				s.send_response(200)
-				s.send_header("Content-type", "text/html")
-				s.end_headers()
-				s.wfile.write('<status>%s</status>' % (send))
-				print send
+				self.send_response(200)
+				self.send_header("Content-type", "text/html")
+				self.end_headers()
+				status = '<status>%s</status>' % send
+				self.wfile.write(status.encode())
+				print(send)
 
 		# Create the httpd service
-		server_class = BaseHTTPServer.HTTPServer
+		server_class = HTTPServer
 		httpd = server_class((DEFAULT_HOST, DEFAULT_PORT), MyHandler)
 		try:
 			# Start the service
-			print 'Listening on %s:%d' % (DEFAULT_HOST, DEFAULT_PORT)
+			print('Listening on %s:%d' % (DEFAULT_HOST, DEFAULT_PORT))
 			httpd.serve_forever()
 		except KeyboardInterrupt:
 			httpd.socket.close()
